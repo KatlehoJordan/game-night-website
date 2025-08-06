@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Game controller icon for Game Night Website -->
+  <rect width="512" height="512" rx="64" fill="#4f46e5"/>
+  <g fill="white" transform="translate(64, 64)">
+    <!-- Game controller body -->
+    <path d="M128 160c-70.7 0-128 57.3-128 128s57.3 128 128 128h128c70.7 0 128-57.3 128-128s-57.3-128-128-128H128z" opacity="0.8"/>
+    
+    <!-- D-pad -->
+    <rect x="80" y="200" width="24" height="72" rx="4"/>
+    <rect x="64" y="216" width="56" height="24" rx="4"/>
+    
+    <!-- Action buttons -->
+    <circle cx="320" cy="216" r="16"/>
+    <circle cx="352" cy="184" r="16"/>
+    <circle cx="352" cy="248" r="16"/>
+    <circle cx="384" cy="216" r="16"/>
+    
+    <!-- Game night text -->
+    <text x="192" y="320" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="white">
+      🎮
+    </text>
+  </g>
+</svg>

@@ -1,23 +1,465 @@
-/* TODO: Implement component-specific styles
- * This file should contain:
- * - Modal styles
- * - Button styles
- * - Form styles
- * - Card styles
- * - Navigation styles
+/**
+ * Component-specific styles for Game Night Website
+ * This file contains styles for custom components and interactive elements
  */
 
-/* Component styles placeholder */
-.modal {
-  /* TODO: Implement modal styles */
+/* Game Night Cards */
+.game-night-card {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: 1px solid var(--color-gray-200);
 }
 
-.btn {
-  /* TODO: Implement button styles */
+.game-night-card:hover {
+  box-shadow: var(--box-shadow-lg);
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
 }
 
-.card {
-  /* TODO: Implement card styles */
+.game-night-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
 }
 
-/* TODO: Add complete component styling */
+.game-night-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+.game-night-card__date {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.game-night-card__description {
+  color: var(--color-gray-600);
+  margin-bottom: var(--spacing-md);
+  line-height: var(--line-height-relaxed);
+}
+
+.game-night-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-gray-200);
+  font-size: var(--font-size-sm);
+}
+
+.game-night-card__guests {
+  color: var(--color-gray-600);
+}
+
+.game-night-card__host {
+  color: var(--color-gray-500);
+}
+
+.game-night-card--full {
+  border-color: var(--color-warning);
+  background-color: #fffbeb;
+}
+
+.game-night-card--past {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.game-night-card--past:hover {
+  transform: none;
+  box-shadow: var(--box-shadow);
+}
+
+/* Guest List Component */
+.guest-list {
+  background: white;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--color-gray-200);
+}
+
+.guest-list__header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.guest-list__title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin: 0;
+}
+
+.guest-list__count {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.guest-list__items {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.guest-list__item {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-gray-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.guest-list__item:last-child {
+  border-bottom: none;
+}
+
+.guest-info {
+  flex: 1;
+}
+
+.guest-info__name {
+  font-weight: 500;
+  color: var(--color-gray-900);
+  margin-bottom: var(--spacing-xs);
+}
+
+.guest-info__meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.guest-list__actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.guest-list__empty {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-gray-500);
+}
+
+/* RSVP Button Component */
+.rsvp-button {
+  display: inline-block;
+}
+
+.rsvp-button--joined .btn {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  color: white;
+}
+
+.rsvp-button--joined .btn:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.rsvp-button--full .btn {
+  background-color: var(--color-gray-400);
+  border-color: var(--color-gray-400);
+  color: white;
+  cursor: not-allowed;
+}
+
+/* Form Components */
+.form-row {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-gray-200);
+  margin-top: var(--spacing-lg);
+}
+
+.form-header {
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.form-header__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-header__subtitle {
+  color: var(--color-gray-600);
+  margin: 0;
+}
+
+.form-fieldset {
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  background-color: var(--color-gray-50);
+}
+
+.form-legend {
+  font-weight: 600;
+  color: var(--color-gray-700);
+  padding: 0 var(--spacing-sm);
+  background-color: white;
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.form-help {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  margin-top: var(--spacing-xs);
+}
+
+.form-input--error {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-input--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Loading States */
+.loading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-gray-500);
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-gray-300);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Status Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  border-radius: var(--border-radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge--success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge--warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge--error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge--info {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* Event Details Display */
+.event-details {
+  padding: var(--spacing-lg);
+}
+
+.event-details__header {
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.event-details__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.event-details__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.event-meta-item {
+  text-align: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-gray-50);
+  border-radius: var(--border-radius);
+}
+
+.event-meta-item__label {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  margin-bottom: var(--spacing-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.event-meta-item__value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
+
+.event-details__description {
+  background-color: var(--color-gray-50);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  line-height: var(--line-height-relaxed);
+}
+
+.event-details__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+}
+
+/* Navigation */
+.nav-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-gray-200);
+  margin-bottom: var(--spacing-lg);
+}
+
+.nav-tab {
+  padding: var(--spacing-md) var(--spacing-lg);
+  color: var(--color-gray-500);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: var(--font-size-base);
+}
+
+.nav-tab:hover {
+  color: var(--color-gray-700);
+}
+
+.nav-tab.is-active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  color: var(--color-gray-500);
+}
+
+.empty-state__icon {
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-gray-600);
+}
+
+.empty-state__description {
+  margin-bottom: var(--spacing-lg);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .game-night-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .game-night-card__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .event-details__meta {
+    grid-template-columns: 1fr;
+  }
+  
+  .event-details__actions {
+    flex-direction: column;
+  }
+  
+  .nav-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .nav-tab {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .guest-list__item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .guest-list__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
