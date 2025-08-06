@@ -302,7 +302,7 @@ class Storage {
           reminders: true,
           updates: true
         },
-        theme: 'auto'
+        theme: 'dark'
       };
     } catch (error) {
       console.error('Error getting user preferences:', error);
