@@ -442,6 +442,39 @@ a:hover {
   border-left: 4px solid var(--color-primary);
 }
 
+.notification__content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.notification__content p {
+  margin: 0;
+  flex: 1;
+}
+
+.notification__close {
+  background: none;
+  border: none;
+  font-size: var(--font-size-lg);
+  color: var(--color-gray-400);
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.notification__close:hover {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
 /* Utility classes */
 .sr-only {
   position: absolute;
