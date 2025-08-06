@@ -5,20 +5,20 @@
 
 /* Game Night Cards */
 .game-night-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow);
   padding: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   transition: all var(--transition-fast);
   cursor: pointer;
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--border-color);
 }
 
 .game-night-card:hover {
   box-shadow: var(--box-shadow-lg);
   transform: translateY(-2px);
-  border-color: var(--color-primary);
+  border-color: var(--border-hover);
 }
 
 .game-night-card__header {
@@ -31,7 +31,7 @@
 .game-night-card__title {
   font-size: var(--font-size-lg);
   font-weight: 600;
-  color: var(--color-gray-900);
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .game-night-card__description {
-  color: var(--color-gray-600);
+  color: var(--text-secondary);
   margin-bottom: var(--spacing-md);
   line-height: var(--line-height-relaxed);
 }
@@ -52,16 +52,16 @@
   justify-content: space-between;
   align-items: center;
   padding-top: var(--spacing-md);
-  border-top: 1px solid var(--color-gray-200);
+  border-top: 1px solid var(--border-color);
   font-size: var(--font-size-sm);
 }
 
 .game-night-card__guests {
-  color: var(--color-gray-600);
+  color: var(--text-secondary);
 }
 
 .game-night-card__host {
-  color: var(--color-gray-500);
+  color: var(--text-muted);
 }
 
 .game-night-card--full {
@@ -81,14 +81,14 @@
 
 /* Guest List Component */
 .guest-list {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: var(--border-radius);
-  border: 1px solid var(--color-gray-200);
+  border: 1px solid var(--border-color);
 }
 
 .guest-list__header {
   padding: var(--spacing-md);
-  border-bottom: 1px solid var(--color-gray-200);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -102,7 +102,7 @@
 
 .guest-list__count {
   font-size: var(--font-size-sm);
-  color: var(--color-gray-500);
+  color: var(--text-muted);
 }
 
 .guest-list__items {
@@ -128,13 +128,13 @@
 
 .guest-info__name {
   font-weight: 500;
-  color: var(--color-gray-900);
+  color: var(--text-primary);
   margin-bottom: var(--spacing-xs);
 }
 
 .guest-info__meta {
   font-size: var(--font-size-sm);
-  color: var(--color-gray-500);
+  color: var(--text-muted);
 }
 
 .guest-list__actions {
@@ -145,7 +145,7 @@
 .guest-list__empty {
   padding: var(--spacing-xl);
   text-align: center;
-  color: var(--color-gray-500);
+  color: var(--text-muted);
 }
 
 /* RSVP Button Component */
