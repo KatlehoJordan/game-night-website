@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Game Night Website - Schedule and manage game nights with friends">
+    <title>Game Night Website</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4f46e5">
+    
+    <!-- Icons -->
+    <link rel="icon" href="assets/icons/favicon.ico">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="header__title">🎮 Game Night</h1>
+            <nav class="header__nav">
+                <button class="btn btn--primary" id="createEventBtn">Create Game Night</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Calendar Container -->
+            <section class="calendar-section">
+                <h2 class="section-title">Upcoming Game Nights</h2>
+                <game-night-calendar id="calendar"></game-night-calendar>
+            </section>
+
+            <!-- Event Details Modal -->
+            <div class="modal" id="eventModal">
+                <div class="modal__content">
+                    <span class="modal__close">&times;</span>
+                    <div id="eventDetails"></div>
+                </div>
+            </div>
+
+            <!-- Game Night Form Modal -->
+            <div class="modal" id="formModal">
+                <div class="modal__content">
+                    <span class="modal__close">&times;</span>
+                    <game-night-form id="gameNightForm"></game-night-form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Game Night Website. Made with ❤️ for game enthusiasts.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/utils/date.js"></script>
+    <script src="js/utils/validation.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/components/calendar.js"></script>
+    <script src="js/components/game-night-form.js"></script>
+    <script src="js/components/guest-list.js"></script>
+    <script src="js/components/rsvp-button.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
