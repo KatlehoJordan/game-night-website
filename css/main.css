@@ -1,0 +1,59 @@
+/* TODO: Implement main CSS styles
+ * This file should contain:
+ * - CSS custom properties for theming
+ * - Base typography and layout styles
+ * - Responsive design utilities
+ * - Color scheme and design system
+ */
+
+:root {
+  /* Colors */
+  --color-primary: #4f46e5;
+  --color-secondary: #06b6d4;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-900: #111827;
+  
+  /* Typography */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-base: 1rem;
+  --line-height-base: 1.5;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Layout */
+  --container-max-width: 1200px;
+  --border-radius: 0.5rem;
+  --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-gray-900);
+  background-color: var(--color-gray-50);
+}
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* TODO: Add complete styling implementation */
