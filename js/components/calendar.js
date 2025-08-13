@@ -192,20 +192,22 @@ class GameNightCalendar extends HTMLElement {
     const eventDate = new Date(event.date);
     const isPast = DateUtils.isPast(eventDate);
     const isFull = event.guests.length >= event.maxGuests;
+    const isShared = event.isShared || false;
     const time = DateUtils.formatDate(eventDate, 'time');
     
     const classes = ['calendar__event'];
     if (isPast) classes.push('calendar__event--past');
     if (isFull) classes.push('calendar__event--full');
+    if (isShared) classes.push('calendar__event--shared');
     
     return `
       <div class="${classes.join(' ')}" 
            data-event-id="${event.id}"
            role="button"
            tabindex="0"
-           title="${event.title} at ${time} - ${event.guests.length}/${event.maxGuests} guests"
+           title="${event.title} at ${time} - ${event.guests.length}/${event.maxGuests} guests${isShared ? ' (Shared Event)' : ''}"
            aria-label="Event: ${event.title} at ${time}">
-        ${event.title}
+        ${isShared ? '🔗 ' : ''}${event.title}
       </div>
     `;
   }

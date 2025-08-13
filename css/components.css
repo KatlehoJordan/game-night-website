@@ -307,6 +307,14 @@
   text-align: center;
 }
 
+.event-details__badges {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-sm);
+}
+
 .event-details__title {
   font-size: var(--font-size-2xl);
   font-weight: 600;
