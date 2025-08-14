@@ -74,12 +74,6 @@ class App {
       createBtn.addEventListener('click', this.handleCreateEventClick);
     }
 
-    // Theme toggle button
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-      themeToggle.addEventListener('click', this.toggleTheme.bind(this));
-    }
-
     // Modal close buttons
     document.addEventListener('click', (event) => {
       if (event.target.matches('.modal__close')) {
@@ -103,13 +97,6 @@ class App {
     window.addEventListener('storage', (event) => {
       if (event.key === Storage.STORAGE_KEYS.EVENTS) {
         this.refreshCalendar();
-      }
-    });
-
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-      if (this.currentTheme === 'auto') {
-        this.setTheme('auto');
       }
     });
   }
@@ -178,11 +165,10 @@ class App {
   loadUserPreferences() {
     if (typeof Storage !== 'undefined') {
       const preferences = Storage.getUserPreferences();
-      // Apply theme
-      this.setTheme(preferences.theme || 'dark');
-    } else {
-      // Default to dark mode if no storage
-      this.setTheme('dark');
+      // Apply theme, timezone, etc.
+      if (preferences.theme && preferences.theme !== 'auto') {
+        document.body.setAttribute('data-theme', preferences.theme);
+      }
     }
   }
 
@@ -733,58 +719,6 @@ class App {
       return Storage.getStorageStats();
     }
     return null;
-  }
-
-  /**
-   * Set theme
-   */
-  setTheme(theme) {
-    this.currentTheme = theme;
-    
-    // Apply theme to document
-    if (theme === 'dark' || theme === 'light') {
-      document.documentElement.setAttribute('data-theme', theme);
-    } else {
-      // Auto theme - detect system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    }
-    
-    // Update theme toggle icon
-    this.updateThemeIcon(theme);
-    
-    // Save preference
-    if (typeof Storage !== 'undefined') {
-      Storage.updateUserPreferences({ theme });
-    }
-  }
-
-  /**
-   * Toggle theme
-   */
-  toggleTheme() {
-    const currentTheme = this.currentTheme || 'dark';
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    this.setTheme(newTheme);
-  }
-
-  /**
-   * Update theme icon
-   */
-  updateThemeIcon(theme) {
-    const themeIcon = document.getElementById('themeIcon');
-    if (themeIcon) {
-      const currentDisplayTheme = document.documentElement.getAttribute('data-theme');
-      themeIcon.textContent = currentDisplayTheme === 'dark' ? '☀️' : '🌙';
-      
-      // Update aria-label for accessibility
-      const themeToggle = document.getElementById('themeToggle');
-      if (themeToggle) {
-        themeToggle.setAttribute('aria-label', 
-          currentDisplayTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
-        );
-      }
-    }
   }
 
   /**
