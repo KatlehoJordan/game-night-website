@@ -25,41 +25,7 @@
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
   
-  /* Theme-specific colors (light mode defaults) */
-  --bg-primary: var(--color-gray-50);
-  --bg-secondary: #ffffff;
-  --bg-elevated: #ffffff;
-  --text-primary: var(--color-gray-900);
-  --text-secondary: var(--color-gray-600);
-  --text-muted: var(--color-gray-500);
-  --border-color: var(--color-gray-200);
-  --border-hover: var(--color-primary);
-}
 
-/* Dark theme */
-[data-theme="dark"] {
-  /* Dark theme grays */
-  --color-gray-50: #0f172a;
-  --color-gray-100: #1e293b;
-  --color-gray-200: #334155;
-  --color-gray-300: #475569;
-  --color-gray-400: #64748b;
-  --color-gray-500: #94a3b8;
-  --color-gray-600: #cbd5e1;
-  --color-gray-700: #e2e8f0;
-  --color-gray-800: #f1f5f9;
-  --color-gray-900: #f8fafc;
-  
-  /* Dark theme-specific colors */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-elevated: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
-  --border-hover: var(--color-primary);
-}
   
   /* Typography */
   --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -136,8 +102,8 @@ body {
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
   line-height: var(--line-height-base);
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
+  color: var(--color-gray-900);
+  background-color: var(--color-gray-50);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -180,15 +146,15 @@ a:hover {
 .section-title {
   font-size: var(--font-size-2xl);
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--color-gray-900);
   margin-bottom: var(--spacing-xl);
   text-align: center;
 }
 
 /* Header */
 .header {
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  background-color: white;
+  border-bottom: 1px solid var(--color-gray-200);
   box-shadow: var(--box-shadow-sm);
   position: sticky;
   top: 0;
@@ -214,33 +180,6 @@ a:hover {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-}
-
-/* Theme Toggle Button */
-.theme-toggle {
-  background: none;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: var(--font-size-lg);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-fast);
-}
-
-.theme-toggle:hover {
-  background-color: var(--bg-elevated);
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-.theme-toggle:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 /* Main content */
@@ -292,14 +231,14 @@ a:hover {
 }
 
 .btn--secondary {
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
-  border-color: var(--border-color);
+  background-color: white;
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-300);
 }
 
 .btn--secondary:hover {
-  background-color: var(--bg-elevated);
-  color: var(--text-primary);
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
 }
 
 .btn--success {
@@ -351,7 +290,7 @@ a:hover {
   display: block;
   font-size: var(--font-size-sm);
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--color-gray-700);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -361,10 +300,9 @@ a:hover {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: var(--font-size-base);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-gray-300);
   border-radius: var(--border-radius);
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: white;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -389,7 +327,7 @@ a:hover {
 
 /* Cards */
 .card {
-  background-color: var(--bg-secondary);
+  background-color: white;
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow);
   padding: var(--spacing-lg);
@@ -399,7 +337,7 @@ a:hover {
 .card__header {
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-gray-200);
 }
 
 .card__title {
@@ -434,7 +372,7 @@ a:hover {
 }
 
 .modal__content {
-  background-color: var(--bg-secondary);
+  background-color: white;
   border-radius: var(--border-radius-lg);
   box-shadow: var(--box-shadow-xl);
   max-width: 500px;
@@ -467,8 +405,8 @@ a:hover {
 }
 
 .modal__close:hover {
-  background-color: var(--bg-elevated);
-  color: var(--text-secondary);
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
 }
 
 /* Notifications */
@@ -476,7 +414,7 @@ a:hover {
   position: fixed;
   top: var(--spacing-lg);
   right: var(--spacing-lg);
-  background-color: var(--bg-secondary);
+  background-color: white;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow-lg);
   padding: var(--spacing-md);
@@ -535,8 +473,8 @@ a:hover {
 }
 
 .notification__close:hover {
-  background-color: var(--bg-elevated);
-  color: var(--text-secondary);
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
 }
 
 /* Utility classes */

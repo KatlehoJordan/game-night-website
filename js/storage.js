@@ -321,7 +321,7 @@ class Storage {
           reminders: true,
           updates: true
         },
-        theme: 'dark'
+        theme: 'auto'
       };
     } catch (error) {
       console.error('Error getting user preferences:', error);
