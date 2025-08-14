@@ -199,6 +199,24 @@
   opacity: 0.7;
 }
 
+.calendar__event--shared {
+  background-color: var(--color-info, #3b82f6);
+  border: 2px dashed var(--color-info-light, #60a5fa);
+  position: relative;
+}
+
+.calendar__event--shared::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  border-radius: var(--border-radius-sm);
+  pointer-events: none;
+}
+
 .calendar__more-events {
   font-size: var(--font-size-xs);
   color: var(--color-gray-500);

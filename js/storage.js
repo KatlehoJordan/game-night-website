@@ -124,12 +124,26 @@ class Storage {
   }
 
   /**
-   * Get all events
+   * Get all events (includes local storage and URL-shared events)
    */
   static getAllEvents() {
     try {
       const eventsJson = localStorage.getItem(this.STORAGE_KEYS.EVENTS);
-      return eventsJson ? JSON.parse(eventsJson) : [];
+      const localEvents = eventsJson ? JSON.parse(eventsJson) : [];
+      
+      // Check for shared events in URL parameters
+      const sharedEvents = this.getSharedEventsFromURL();
+      
+      // Merge shared events with local events, avoiding duplicates
+      const allEvents = [...localEvents];
+      sharedEvents.forEach(sharedEvent => {
+        // Only add shared event if it doesn't already exist locally
+        if (!allEvents.find(event => event.id === sharedEvent.id)) {
+          allEvents.push(sharedEvent);
+        }
+      });
+      
+      return allEvents;
     } catch (error) {
       console.error('Error getting all events:', error);
       return [];
@@ -206,6 +220,11 @@ class Storage {
       };
 
       event.guests.push(guest);
+      
+      // If this is a shared event, import it to local storage first
+      if (event.isShared) {
+        this.importSharedEvent(eventId);
+      }
       
       // Update the event
       return this.updateEvent(eventId, { guests: event.guests });
@@ -468,6 +487,119 @@ class Storage {
       };
     } catch (error) {
       console.error('Error getting storage stats:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get shared events from URL parameters
+   */
+  static getSharedEventsFromURL() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sharedEventData = urlParams.get('event');
+      
+      if (sharedEventData) {
+        // Decode the base64 encoded JSON
+        const decodedData = atob(decodeURIComponent(sharedEventData));
+        const eventData = JSON.parse(decodedData);
+        
+        // Validate the shared event data
+        const validation = this.validateEventData(eventData);
+        if (validation.valid) {
+          // Mark as shared event and ensure it has an ID
+          eventData.isShared = true;
+          if (!eventData.id) {
+            eventData.id = this.generateId();
+          }
+          return [eventData];
+        }
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Error parsing shared event from URL:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Generate a shareable URL for an event
+   */
+  static generateShareableURL(eventId) {
+    try {
+      const event = this.getEvent(eventId);
+      if (!event) {
+        throw new Error('Event not found');
+      }
+
+      // Create a clean copy of event data for sharing
+      const shareableEvent = {
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        date: event.date,
+        duration: event.duration,
+        maxGuests: event.maxGuests,
+        host: event.host,
+        guests: event.guests || [],
+        metadata: {
+          ...event.metadata,
+          sharedAt: new Date().toISOString()
+        }
+      };
+
+      // Encode the event data as base64
+      const encodedData = btoa(JSON.stringify(shareableEvent));
+      
+      // Create the shareable URL
+      const baseURL = window.location.origin + window.location.pathname;
+      const shareableURL = `${baseURL}?event=${encodeURIComponent(encodedData)}`;
+      
+      return shareableURL;
+    } catch (error) {
+      console.error('Error generating shareable URL:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Import shared event to local storage
+   */
+  static importSharedEvent(eventId) {
+    try {
+      const sharedEvents = this.getSharedEventsFromURL();
+      const sharedEvent = sharedEvents.find(event => event.id === eventId);
+      
+      if (!sharedEvent) {
+        throw new Error('Shared event not found');
+      }
+
+      // Remove the shared flag and import to local storage
+      const eventToImport = { ...sharedEvent };
+      delete eventToImport.isShared;
+      
+      // Get existing local events
+      const localEventsJson = localStorage.getItem(this.STORAGE_KEYS.EVENTS);
+      const localEvents = localEventsJson ? JSON.parse(localEventsJson) : [];
+      
+      // Check if event already exists locally
+      const existingIndex = localEvents.findIndex(event => event.id === eventId);
+      
+      if (existingIndex >= 0) {
+        // Update existing local event
+        localEvents[existingIndex] = eventToImport;
+      } else {
+        // Add as new local event
+        localEvents.push(eventToImport);
+      }
+      
+      // Save to localStorage
+      localStorage.setItem(this.STORAGE_KEYS.EVENTS, JSON.stringify(localEvents));
+      
+      return eventToImport;
+    } catch (error) {
+      console.error('Error importing shared event:', error);
       return null;
     }
   }

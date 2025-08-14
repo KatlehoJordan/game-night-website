@@ -135,6 +135,9 @@ class App {
    * Load initial data
    */
   loadInitialData() {
+    // Check for shared events in URL
+    this.checkForSharedEvents();
+    
     // Load user preferences
     this.loadUserPreferences();
     
@@ -143,6 +146,30 @@ class App {
     
     // Load current user if available
     this.loadCurrentUser();
+  }
+
+  /**
+   * Check for shared events in URL parameters
+   */
+  checkForSharedEvents() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('event')) {
+        // Show notification about shared event
+        const sharedEvents = Storage.getSharedEventsFromURL();
+        if (sharedEvents.length > 0) {
+          const event = sharedEvents[0];
+          this.showNotification(`Viewing shared event: "${event.title}"`, 'info');
+          
+          // Optionally auto-open the event details
+          setTimeout(() => {
+            this.showEventDetails(event.id);
+          }, 1000);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for shared events:', error);
+    }
   }
 
   /**
@@ -291,16 +318,21 @@ class App {
 
     const eventDate = new Date(event.date);
     const isPast = DateUtils.isPast(eventDate);
-    const isFull = event.guests.length >= event.maxGuests;
-    const spotsLeft = event.maxGuests - event.guests.length;
+    const guests = event.guests || [];
+    const isFull = guests.length >= event.maxGuests;
+    const spotsLeft = event.maxGuests - guests.length;
+    const isShared = event.isShared || false;
 
     eventDetails.innerHTML = `
       <div class="event-details">
         <div class="event-details__header">
           <h2 class="event-details__title">${this.escapeHtml(event.title)}</h2>
-          ${isPast ? '<span class="badge badge--error">Past Event</span>' : 
-            isFull ? '<span class="badge badge--warning">Full</span>' : 
-            '<span class="badge badge--success">Available</span>'}
+          <div class="event-details__badges">
+            ${isPast ? '<span class="badge badge--error">Past Event</span>' : 
+              isFull ? '<span class="badge badge--warning">Full</span>' : 
+              '<span class="badge badge--success">Available</span>'}
+            ${isShared ? '<span class="badge badge--info">Shared Event</span>' : ''}
+          </div>
         </div>
         
         <div class="event-details__meta">
@@ -318,7 +350,7 @@ class App {
           </div>
           <div class="event-meta-item">
             <div class="event-meta-item__label">Guests</div>
-            <div class="event-meta-item__value">${event.guests.length}/${event.maxGuests}</div>
+            <div class="event-meta-item__value">${guests.length}/${event.maxGuests}</div>
           </div>
         </div>
         
@@ -332,11 +364,11 @@ class App {
         <div class="guest-list">
           <div class="guest-list__header">
             <h3 class="guest-list__title">Attendees</h3>
-            <span class="guest-list__count">${event.guests.length} guest${event.guests.length !== 1 ? 's' : ''}</span>
+            <span class="guest-list__count">${guests.length} guest${guests.length !== 1 ? 's' : ''}</span>
           </div>
           <div class="guest-list__items">
-            ${event.guests.length > 0 ? 
-              event.guests.map(guest => `
+            ${guests.length > 0 ? 
+              guests.map(guest => `
                 <div class="guest-list__item">
                   <div class="guest-info">
                     <div class="guest-info__name">${this.escapeHtml(guest.name)}</div>
@@ -359,17 +391,29 @@ class App {
             </button>
           ` : ''}
           
-          <button class="btn btn--secondary" onclick="app.showEditEventForm('${event.id}')">
-            Edit Event
+          ${isShared ? `
+            <button class="btn btn--primary" onclick="app.importSharedEvent('${event.id}')">
+              Save to My Events
+            </button>
+          ` : ''}
+          
+          <button class="btn btn--secondary" onclick="app.shareEvent('${event.id}')">
+            Share Event
           </button>
           
-          <button class="btn btn--danger" onclick="app.deleteEvent('${event.id}')">
-            Delete Event
-          </button>
+          ${!isShared ? `
+            <button class="btn btn--secondary" onclick="app.showEditEventForm('${event.id}')">
+              Edit Event
+            </button>
+            
+            <button class="btn btn--danger" onclick="app.deleteEvent('${event.id}')">
+              Delete Event
+            </button>
+          ` : ''}
         </div>
         
         <div class="event-details__host">
-          <small>Hosted by ${this.escapeHtml(event.host.name)}</small>
+          <small>Hosted by ${this.escapeHtml((event.host && event.host.name) || 'Unknown Host')}</small>
         </div>
       </div>
     `;
@@ -430,6 +474,107 @@ class App {
         console.error('Error deleting event:', error);
         this.showNotification('Error deleting event', 'error');
       }
+    }
+  }
+
+  /**
+   * Share event - generate shareable URL
+   */
+  shareEvent(eventId) {
+    try {
+      const shareURL = Storage.generateShareableURL(eventId);
+      if (shareURL) {
+        // Try to use the Web Share API if available
+        if (navigator.share) {
+          navigator.share({
+            title: 'Game Night Event',
+            text: 'Join me for a game night!',
+            url: shareURL
+          }).catch(error => {
+            // Fallback to clipboard if sharing fails
+            this.copyToClipboard(shareURL);
+          });
+        } else {
+          // Fallback to clipboard
+          this.copyToClipboard(shareURL);
+        }
+      }
+    } catch (error) {
+      console.error('Error sharing event:', error);
+      this.showNotification('Error sharing event', 'error');
+    }
+  }
+
+  /**
+   * Copy text to clipboard
+   */
+  copyToClipboard(text) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        this.showNotification('Event link copied to clipboard!', 'success');
+      }).catch(error => {
+        console.error('Failed to copy to clipboard:', error);
+        this.showShareDialog(text);
+      });
+    } else {
+      // Fallback for older browsers
+      this.showShareDialog(text);
+    }
+  }
+
+  /**
+   * Show share dialog with URL
+   */
+  showShareDialog(shareURL) {
+    const message = `Share this link to invite others to your game night:\n\n${shareURL}`;
+    
+    // Create a simple modal for the share URL
+    const modal = document.createElement('div');
+    modal.className = 'modal is-open';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+      <div class="modal__content">
+        <span class="modal__close" onclick="this.parentElement.parentElement.remove(); document.body.style.overflow = '';">&times;</span>
+        <h2>Share Game Night</h2>
+        <p>Copy this link to share your game night with others:</p>
+        <div style="margin: 1rem 0;">
+          <input type="text" value="${shareURL}" readonly style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;" onclick="this.select()">
+        </div>
+        <button class="btn btn--primary" onclick="navigator.clipboard ? navigator.clipboard.writeText('${shareURL}').then(() => alert('Copied!')) : this.previousElementSibling.querySelector('input').select(); this.parentElement.parentElement.remove(); document.body.style.overflow = '';">
+          Copy Link
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    
+    // Auto-select the input
+    setTimeout(() => {
+      const input = modal.querySelector('input');
+      if (input) {
+        input.select();
+      }
+    }, 100);
+  }
+
+  /**
+   * Import shared event to local storage
+   */
+  importSharedEvent(eventId) {
+    try {
+      const importedEvent = Storage.importSharedEvent(eventId);
+      if (importedEvent) {
+        this.showNotification('Event saved to your calendar!', 'success');
+        this.refreshCalendar();
+        // Re-render the event details to show the updated state
+        this.renderEventDetails(importedEvent);
+      } else {
+        throw new Error('Failed to import event');
+      }
+    } catch (error) {
+      console.error('Error importing shared event:', error);
+      this.showNotification('Error saving event', 'error');
     }
   }
 
