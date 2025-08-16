@@ -310,23 +310,37 @@ npx serve . -p 8000
 - Custom domain support available
 
 **Deployment Configuration**:
+
+Three GitHub Actions workflows handle deployment:
+
+1. **Main Deployment** (`.github/workflows/deploy.yml`):
 ```yaml
-# .github/workflows/deploy.yml (if needed for future automation)
 name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          path: '.'
+      - uses: actions/deploy-pages@v4
 ```
+
+2. **PR Preview Deployment** (`.github/workflows/pr-preview.yml`):
+   - Triggers when PRs are marked as "ready for review"
+   - Deploys to `https://[owner].github.io/[repo]/pr-[number]/`
+   - Uses environments for deployment protection
+   - Automatically comments on PRs with preview links
+
+3. **PR Cleanup** (`.github/workflows/pr-cleanup.yml`):
+   - Cleans up preview deployments when PRs are closed
+   - Maintains organized deployment structure
 
 ## 📱 Progressive Web App (PWA)
 

@@ -1,0 +1,143 @@
+name: Deploy PR Preview
+
+on:
+  pull_request:
+    types: [ready_for_review, synchronize]
+    branches: [main]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    # Only run if PR is ready for review (not draft)
+    if: github.event.pull_request.draft == false
+    
+    # Use environments for deployment protection
+    environment:
+      name: pr-preview-${{ github.event.pull_request.number }}
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Prepare deployment directory
+        run: |
+          # Create a deployment directory with PR-specific path
+          mkdir -p deploy/pr-${{ github.event.pull_request.number }}
+          
+          # Copy all application files to PR-specific directory
+          cp -r index.html css js assets manifest.json deploy/pr-${{ github.event.pull_request.number }}/
+          
+          # Update base URL in index.html for proper asset loading
+          sed -i 's|href="css/|href="/game-night-website/pr-${{ github.event.pull_request.number }}/css/|g' deploy/pr-${{ github.event.pull_request.number }}/index.html
+          sed -i 's|src="js/|src="/game-night-website/pr-${{ github.event.pull_request.number }}/js/|g' deploy/pr-${{ github.event.pull_request.number }}/index.html
+          sed -i 's|href="assets/|href="/game-night-website/pr-${{ github.event.pull_request.number }}/assets/|g' deploy/pr-${{ github.event.pull_request.number }}/index.html
+          sed -i 's|href="manifest.json"|href="/game-night-website/pr-${{ github.event.pull_request.number }}/manifest.json"|g' deploy/pr-${{ github.event.pull_request.number }}/index.html
+          
+          # Create index.html at root to list available previews
+          cat > deploy/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Game Night Website - PR Previews</title>
+              <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 40px; }
+                  .pr-list { list-style: none; padding: 0; }
+                  .pr-item { margin: 10px 0; padding: 15px; border: 1px solid #e1e5e9; border-radius: 6px; }
+                  .pr-link { color: #0366d6; text-decoration: none; font-weight: 600; }
+                  .pr-link:hover { text-decoration: underline; }
+              </style>
+          </head>
+          <body>
+              <h1>🎮 Game Night Website - PR Previews</h1>
+              <p>This page lists available pull request previews.</p>
+              <ul class="pr-list">
+                  <li class="pr-item">
+                      <a href="./pr-${{ github.event.pull_request.number }}/" class="pr-link">
+                          PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}
+                      </a>
+                  </li>
+              </ul>
+              <p><a href="https://github.com/${{ github.repository }}/pulls">← Back to Pull Requests</a></p>
+          </body>
+          </html>
+          EOF
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy/
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+      - name: Update PR with preview link
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const deploymentUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/pr-${prNumber}`;
+            
+            // Find existing preview comment
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            
+            const previewComment = comments.data.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes('🚀 PR Preview')
+            );
+            
+            const commentBody = `🚀 **PR Preview Deployed!**
+            
+            Your pull request has been deployed and is available at:
+            **${deploymentUrl}**
+            
+            ✅ This preview will update automatically when you push new commits to this PR.
+            
+            <details>
+            <summary>Deployment Details</summary>
+            
+            - **Environment**: pr-preview-${prNumber}
+            - **Commit**: ${{ github.event.pull_request.head.sha }}
+            - **Deployed**: ${new Date().toISOString()}
+            
+            </details>`;
+            
+            if (previewComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previewComment.id,
+                body: commentBody
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+            }

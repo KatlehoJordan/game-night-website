@@ -41,8 +41,9 @@ This website is designed to be hosted on GitHub Pages and provides a streamlined
 - **Web Components**: Reusable UI components for modularity
 
 ### Hosting & Deployment
-- **GitHub Pages**: Static site hosting
-- **GitHub Actions**: Automated deployment pipeline
+- **GitHub Pages**: Static site hosting with automatic deployment
+- **GitHub Actions**: Automated deployment pipeline for main branch and PR previews
+- **PR Preview Deployments**: Automatic preview deployments for pull requests marked as "ready for review"
 
 ## 📁 Project Structure
 
@@ -190,6 +191,30 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 5. Commit using conventional commits: `git commit -m "feat: add amazing feature"`
 6. Push to your fork: `git push origin feature/amazing-feature`
 7. Open a Pull Request
+
+## 🚀 Deployment
+
+This project uses automated deployment with GitHub Actions:
+
+### Production Deployment
+- **Trigger**: Push to `main` branch
+- **URL**: https://katleho-jordan.github.io/game-night-website/
+- **Process**: Automatic deployment via GitHub Actions
+
+### PR Preview Deployments
+- **Trigger**: Pull requests marked as "ready for review"
+- **URL**: https://katleho-jordan.github.io/game-night-website/pr-[number]/
+- **Features**:
+  - Automatic preview links in PR comments
+  - Updates on new commits
+  - Cleanup when PR is closed
+
+### Setup Requirements
+1. Enable GitHub Pages in repository settings
+2. Set Pages source to "GitHub Actions"
+3. Configure branch protection rules for deployment control
+
+For detailed deployment documentation, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## 📋 Roadmap
 
