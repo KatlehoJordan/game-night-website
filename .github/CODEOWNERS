@@ -1,0 +1,6 @@
+# Code owners for the Game Night Website
+# This file specifies who should be automatically requested for review
+# when pull requests are opened that modify files in this repository.
+
+# Make KatlehoJordan the codeowner for all files in the repository
+* @KatlehoJordan
