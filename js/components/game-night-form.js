@@ -42,11 +42,10 @@ class GameNightForm extends HTMLElement {
       title: '',
       description: '',
       date: defaultDate,
+      startHour: defaultDate.getHours(),
       maxGuests: 6,
-      duration: 180,
       host: {
-        name: '',
-        email: ''
+        name: ''
       }
     };
     
@@ -67,6 +66,13 @@ class GameNightForm extends HTMLElement {
       const event = Storage.getEvent(eventId);
       if (event) {
         this.formData = { ...event };
+        
+        // Extract hour from date for the new form structure
+        if (this.formData.date) {
+          const eventDate = new Date(this.formData.date);
+          this.formData.startHour = eventDate.getHours();
+        }
+        
         this.render();
         this.focusFirstInput();
         return true;
@@ -104,13 +110,23 @@ class GameNightForm extends HTMLElement {
     
     // Validate date
     if (!data.date) {
-      errors.date = 'Date and time are required';
+      errors.date = 'Date is required';
     } else {
       const eventDate = new Date(data.date);
       if (isNaN(eventDate.getTime())) {
         errors.date = 'Invalid date format';
       } else if (!this.isEditMode && eventDate <= new Date()) {
         errors.date = 'Event date must be in the future';
+      }
+    }
+    
+    // Validate start hour
+    if (data.startHour === undefined || data.startHour === null || data.startHour === '') {
+      errors.startHour = 'Start hour is required';
+    } else {
+      const hour = parseInt(data.startHour);
+      if (isNaN(hour) || hour < 0 || hour > 23) {
+        errors.startHour = 'Start hour must be between 0 and 23';
       }
     }
     
@@ -131,19 +147,9 @@ class GameNightForm extends HTMLElement {
       errors.description = 'Description must be less than 500 characters';
     }
     
-    // Validate duration (optional)
-    if (data.duration && (isNaN(data.duration) || data.duration < 30)) {
-      errors.duration = 'Duration must be at least 30 minutes';
-    }
-    
     // Validate host name
     if (!data.host || !data.host.name || data.host.name.trim().length < 2) {
       errors.hostName = 'Host name is required (at least 2 characters)';
-    }
-    
-    // Validate host email (optional)
-    if (data.host && data.host.email && !ValidationUtils.validateEmail(data.host.email)) {
-      errors.hostEmail = 'Invalid email format';
     }
     
     return {
@@ -163,13 +169,19 @@ class GameNightForm extends HTMLElement {
       return false;
     }
     
+    // Combine date and startHour into a single date
+    const eventDate = new Date(this.formData.date);
+    eventDate.setHours(parseInt(this.formData.startHour), 0, 0, 0);
+    
     // Prepare event data
     const eventData = {
       ...this.formData,
       maxGuests: parseInt(this.formData.maxGuests),
-      duration: parseInt(this.formData.duration) || 180,
-      date: new Date(this.formData.date).toISOString()
+      date: eventDate.toISOString()
     };
+    
+    // Remove startHour from the final data since we've combined it with date
+    delete eventData.startHour;
     
     // Emit form submit event
     this.dispatchEvent(new CustomEvent('formSubmit', {
@@ -258,32 +270,29 @@ class GameNightForm extends HTMLElement {
           
           <div class="form-row">
             <div class="form-group">
-              <label for="date" class="form-label">Date & Time *</label>
+              <label for="date" class="form-label">Date *</label>
               <input 
-                type="datetime-local" 
+                type="date" 
                 id="date" 
                 name="date" 
                 class="form-input ${this.errors.date ? 'form-input--error' : ''}"
-                value="${this.formatDateForInput(this.formData.date)}"
+                value="${this.formatDateOnly(this.formData.date)}"
                 required
               />
               ${this.renderError('date')}
             </div>
             
             <div class="form-group">
-              <label for="duration" class="form-label">Duration (minutes)</label>
-              <input 
-                type="number" 
-                id="duration" 
-                name="duration" 
-                class="form-input ${this.errors.duration ? 'form-input--error' : ''}"
-                value="${this.formData.duration || 180}"
-                min="30"
-                max="720"
-                step="30"
-              />
-              ${this.renderError('duration')}
-              <div class="form-help">How long will the event last?</div>
+              <label for="startHour" class="form-label">Start Hour *</label>
+              <select 
+                id="startHour" 
+                name="startHour" 
+                class="form-input ${this.errors.startHour ? 'form-input--error' : ''}"
+                required
+              >
+                ${this.renderHourOptions()}
+              </select>
+              ${this.renderError('startHour')}
             </div>
           </div>
           
@@ -306,38 +315,20 @@ class GameNightForm extends HTMLElement {
           <fieldset class="form-fieldset">
             <legend class="form-legend">Host Information</legend>
             
-            <div class="form-row">
-              <div class="form-group">
-                <label for="hostName" class="form-label">Your Name *</label>
-                <input 
-                  type="text" 
-                  id="hostName" 
-                  name="hostName" 
-                  data-field="hostName"
-                  class="form-input ${this.errors.hostName ? 'form-input--error' : ''}"
-                  value="${this.escapeHtml(this.formData.host?.name || '')}"
-                  placeholder="Your name"
-                  maxlength="50"
-                  required
-                />
-                ${this.renderError('hostName')}
-              </div>
-              
-              <div class="form-group">
-                <label for="hostEmail" class="form-label">Your Email</label>
-                <input 
-                  type="email" 
-                  id="hostEmail" 
-                  name="hostEmail" 
-                  data-field="hostEmail"
-                  class="form-input ${this.errors.hostEmail ? 'form-input--error' : ''}"
-                  value="${this.escapeHtml(this.formData.host?.email || '')}"
-                  placeholder="your.email@example.com"
-                  maxlength="100"
-                />
-                ${this.renderError('hostEmail')}
-                <div class="form-help">Optional - for guests to contact you</div>
-              </div>
+            <div class="form-group">
+              <label for="hostName" class="form-label">Your Name *</label>
+              <input 
+                type="text" 
+                id="hostName" 
+                name="hostName" 
+                data-field="hostName"
+                class="form-input ${this.errors.hostName ? 'form-input--error' : ''}"
+                value="${this.escapeHtml(this.formData.host?.name || '')}"
+                placeholder="Your name"
+                maxlength="50"
+                required
+              />
+              ${this.renderError('hostName')}
             </div>
           </fieldset>
           
@@ -420,9 +411,9 @@ class GameNightForm extends HTMLElement {
     }
     
     // Update form data
-    if (name === 'hostName' || name === 'hostEmail') {
+    if (name === 'hostName') {
       if (!this.formData.host) this.formData.host = {};
-      this.formData.host[name.replace('host', '').toLowerCase()] = value;
+      this.formData.host.name = value;
     } else {
       this.formData[name] = value;
     }
@@ -453,9 +444,9 @@ class GameNightForm extends HTMLElement {
     
     // Basic fields
     for (const [key, value] of formData.entries()) {
-      if (key === 'hostName' || key === 'hostEmail') {
+      if (key === 'hostName') {
         if (!this.formData.host) this.formData.host = {};
-        this.formData.host[key.replace('host', '').toLowerCase()] = value;
+        this.formData.host.name = value;
       } else {
         this.formData[key] = value;
       }
@@ -468,6 +459,44 @@ class GameNightForm extends HTMLElement {
   formatDateForInput(date) {
     if (!date) return '';
     return DateUtils.formatForInput(date);
+  }
+
+  /**
+   * Format date only for date input
+   */
+  formatDateOnly(date) {
+    if (!date) return '';
+    return DateUtils.formatForDateInput(date);
+  }
+
+  /**
+   * Get hour from date
+   */
+  getHourFromDate(date) {
+    if (!date) return 18; // Default to 6 PM
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return 18;
+    return d.getHours();
+  }
+
+  /**
+   * Render hour options for select
+   */
+  renderHourOptions() {
+    const selectedHour = this.getHourFromDate(this.formData.date);
+    let options = '';
+    
+    for (let hour = 0; hour < 24; hour++) {
+      const hourStr = hour.toString().padStart(2, '0');
+      const displayHour = hour === 0 ? '12 AM' : 
+                         hour < 12 ? `${hour} AM` : 
+                         hour === 12 ? '12 PM' : 
+                         `${hour - 12} PM`;
+      const selected = hour === selectedHour ? 'selected' : '';
+      options += `<option value="${hour}" ${selected}>${displayHour}</option>`;
+    }
+    
+    return options;
   }
 
   /**
