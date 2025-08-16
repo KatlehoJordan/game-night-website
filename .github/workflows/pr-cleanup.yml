@@ -1,0 +1,83 @@
+name: Cleanup PR Preview
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  cleanup-preview:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Prepare cleaned deployment
+        run: |
+          # Create deployment directory
+          mkdir -p deploy
+          
+          # Copy main branch files to root
+          cp -r index.html css js assets manifest.json deploy/
+          
+          # Create a simple index page that lists no active previews
+          cat > deploy/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Game Night Website</title>
+              <style>
+                  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 40px; }
+                  .info { padding: 15px; background: #f6f8fa; border-radius: 6px; margin: 20px 0; }
+              </style>
+          </head>
+          <body>
+              <h1>🎮 Game Night Website</h1>
+              <div class="info">
+                  <p>This is the main Game Night Website.</p>
+                  <p>PR previews are cleaned up when pull requests are closed.</p>
+              </div>
+              <p><a href="https://github.com/${{ github.repository }}">→ View Repository</a></p>
+          </body>
+          </html>
+          EOF
+          
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy/
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        
+      - name: Comment on closed PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            
+            const commentBody = `🧹 **PR Preview Cleaned Up**
+            
+            The preview for this pull request has been removed since the PR was closed.
+            
+            The main site is available at: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: commentBody
+            });
